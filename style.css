@@ -1,92 +1,118 @@
-:root {
-    --primary: #1a73e8;
-    --success: #34a853;
-    --danger: #d93025;
-    --bg: #f8f9fa;
+const ADMIN_PASS = "Mertule Mariyam@2026";
+let questions = [];
+let currentIdx = 0;
+let userAnswers = {};
+let timer;
+let timeLeft = 3600;
+
+// ናሙና ጥያቄዎች
+const database = {
+    natural: [
+        { q: "የኢትዮጵያ ረጅሙ ወንዝ የትኛው ነው?", a: "አባይ", b: "ዋቢ ሸበሌ", c: "አዋሽ", d: "ገናሌ", r: "A" },
+        { q: "ብርሃን በሰከንድ ስንት ኪሎሜትር ይጓዛል?", a: "300,000", b: "150,000", c: "500,000", d: "1,000,000", r: "A" }
+    ],
+    social: [
+        { q: "የኢትዮጵያ ዋና ከተማ ማን ናት?", a: "ጎንደር", b: "አክሱም", c: "አዲስ አበባ", d: "ሀዋሳ", r: "C" }
+    ]
+};
+
+function navigateTo(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
 }
 
-body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: var(--bg);
+function askAdminPassword() {
+    let p = prompt("Password ያስገቡ:");
+    if (p === ADMIN_PASS) navigateTo('admin-page');
+    else alert("ስህተት!");
 }
 
-.screen {
-    display: none;
-    height: 100vh;
-    padding: 20px;
-    box-sizing: border-box;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+function showSubjects(field) {
+    const container = document.getElementById('subjects-container');
+    container.innerHTML = "";
+    document.getElementById('field-title').innerText = field.toUpperCase();
+    
+    const subs = field === 'natural' ? 
+        ['English', 'Maths', 'Physics', 'Chemistry', 'Biology'] : 
+        ['English', 'Maths', 'History', 'Geography', 'Economics'];
+
+    subs.forEach(s => {
+        const div = document.createElement('div');
+        div.className = "card";
+        div.innerText = s;
+        div.onclick = () => startExam(field);
+        container.appendChild(div);
+    });
+    navigateTo('subject-page');
 }
 
-.screen.active { display: flex; }
-.hidden { display: none !important; }
-
-/* Animation */
-.animate-text {
-    font-size: 24px;
-    animation: colorSwap 6s infinite;
+function startExam(field) {
+    questions = database[field];
+    currentIdx = 0;
+    userAnswers = {};
+    timeLeft = 3600;
+    showQuestion();
+    startTimer();
+    navigateTo('exam-page');
 }
 
-@keyframes colorSwap {
-    0% { color: var(--primary); }
-    33% { color: var(--success); }
-    66% { color: var(--danger); }
+function showQuestion() {
+    const q = questions[currentIdx];
+    document.getElementById('q-text').innerText = q.q;
+    document.getElementById('q-count').innerText = `ጥያቄ ${currentIdx + 1}/${questions.length}`;
+    
+    const container = document.getElementById('options-list');
+    container.innerHTML = `
+        <button class="option-btn ${userAnswers[currentIdx]=='A'?'selected':''}" onclick="select('A')">A. ${q.a}</button>
+        <button class="option-btn ${userAnswers[currentIdx]=='B'?'selected':''}" onclick="select('B')">B. ${q.b}</button>
+        <button class="option-btn ${userAnswers[currentIdx]=='C'?'selected':''}" onclick="select('C')">C. ${q.c}</button>
+        <button class="option-btn ${userAnswers[currentIdx]=='D'?'selected':''}" onclick="select('D')">D. ${q.d}</button>
+    `;
+
+    document.getElementById('prev-btn').style.visibility = (currentIdx === 0) ? "hidden" : "visible";
+    
+    if (currentIdx === questions.length - 1) {
+        document.getElementById('next-btn').classList.add('hidden');
+        document.getElementById('submit-btn').classList.remove('hidden');
+    } else {
+        document.getElementById('next-btn').classList.remove('hidden');
+        document.getElementById('submit-btn').classList.add('hidden');
+    }
 }
 
-/* Buttons */
-button {
-    padding: 15px 25px;
-    margin: 10px;
-    border: none;
-    border-radius: 8px;
-    font-size: 18px;
-    cursor: pointer;
-    width: 80%;
-    max-width: 300px;
+function select(ans) {
+    userAnswers[currentIdx] = ans;
+    showQuestion();
 }
 
-.btn-primary { background: var(--primary); color: white; }
-.btn-secondary { background: #5f6368; color: white; }
-.btn-admin { background: var(--danger); color: white; }
-.btn-back { background: transparent; color: #5f6368; text-decoration: underline; }
-
-/* Grid for Cards */
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    width: 100%;
+function moveNext() {
+    if (!userAnswers[currentIdx]) return alert("እባክዎ መልስ ይምረጡ!");
+    currentIdx++;
+    showQuestion();
 }
 
-.card {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+function movePrev() {
+    if (currentIdx > 0) {
+        currentIdx--;
+        showQuestion();
+    }
 }
 
-/* Exam Styles */
-.exam-header {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    color: var(--danger);
-    font-weight: bold;
-    margin-bottom: 20px;
+function startTimer() {
+    if (timer) clearInterval(timer);
+    timer = setInterval(() => {
+        timeLeft--;
+        let m = Math.floor(timeLeft / 60);
+        let s = timeLeft % 60;
+        document.getElementById('timer').innerText = `ጊዜ: ${m}:${s < 10 ? '0'+s : s}`;
+        if (timeLeft <= 0) finishExam();
+    }, 1000);
 }
 
-.option-btn {
-    background: white;
-    border: 2px solid #ddd;
-    text-align: left;
-    margin: 5px 0;
-}
-
-.option-btn.selected {
-    border-color: var(--primary);
-    background: #e8f0fe;
+function finishExam() {
+    clearInterval(timer);
+    let score = 0;
+    questions.forEach((q, i) => { if (userAnswers[i] === q.r) score++; });
+    document.getElementById('final-score').innerText = `${score}/${questions.length}`;
+    navigateTo('result-page');
 }
