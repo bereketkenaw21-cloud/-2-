@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mertule Mariyam Offline Exam App</title>
-    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
@@ -13,75 +12,71 @@
     <section id="welcome-page" class="screen active">
         <div class="hero">
             <h1 class="animate-text">እንኳን ወደ መርጡለ ማሪያም 2ኛ ደረጃ ትምህርት ቤት የብሔራዊ ፈተና መለማመጃ ሲስተም በደህና መጡ።</h1>
-            <h2 class="creator-tag">አዘጋጅ፡ በረከት ቀናው</h2>
-            <div class="btn-group">
-                <button class="btn-primary" onclick="navigateTo('login-choice')">ይግቡ</button>
-                <button class="btn-secondary" onclick="navigateTo('qr-scanner-page')">በ QR ኮድ ጥያቄ ተቀበል</button>
+            <p class="author">አዘጋጅ፡ በረከት ቀናው</p>
+            <div class="btn-container">
+                <button class="btn-main" onclick="navigateTo('login-choice')">ይግቡ</button>
+                <button class="btn-sub" onclick="navigateTo('qr-scanner-page')">በ QR ኮድ ጥያቄ ተቀበል</button>
             </div>
         </div>
     </section>
 
     <section id="login-choice" class="screen">
-        <h2>ሚናዎን ይምረጡ</h2>
-        <button class="btn-primary" onclick="navigateTo('field-page')">ተማሪ</button>
+        <h2>ማንነትዎን ይምረጡ</h2>
+        <button class="btn-main" onclick="navigateTo('field-page')">ተማሪ</button>
         <button class="btn-admin" onclick="askAdminPassword()">Admin</button>
-        <button class="btn-back" onclick="navigateTo('welcome-page')">ተመለስ</button>
+        <p class="back-link" onclick="navigateTo('welcome-page')">ተመለስ</p>
     </section>
 
     <section id="field-page" class="screen">
-        <h2>የትምህርት ዘርፍ ይምረጡ</h2>
+        <h2>የትምህርት ዘርፍዎን ይምረጡ</h2>
         <div class="grid">
             <div class="card" onclick="showSubjects('natural')">🔬 Natural Science</div>
             <div class="card" onclick="showSubjects('social')">🌍 Social Science</div>
         </div>
-        <button class="btn-back" onclick="navigateTo('login-choice')">ተመለስ</button>
+        <p class="back-link" onclick="navigateTo('login-choice')">ተመለስ</p>
     </section>
 
     <section id="subject-page" class="screen">
         <h2 id="field-title">ትምህርቶች</h2>
         <div id="subjects-container" class="grid"></div>
-        <button class="btn-back" onclick="navigateTo('field-page')">ተመለስ</button>
+        <p class="back-link" onclick="navigateTo('field-page')">ተመለስ</p>
     </section>
 
     <section id="exam-page" class="screen">
         <div class="exam-header">
-            <div id="timer">ጊዜ: 01:00:00</div>
-            <div id="q-progress">ጥያቄ 1/0</div>
+            <div id="timer">ጊዜ: 60:00</div>
+            <div id="q-count">ጥያቄ 1/0</div>
         </div>
-        <div class="question-box">
-            <p id="q-text"></p>
+        <div class="question-container">
+            <p id="q-text" class="q-style"></p>
             <div id="options-list"></div>
         </div>
         <div class="exam-footer">
-            <button id="prev-btn" onclick="movePrev()">ወደኋላ</button>
-            <button id="next-btn" onclick="moveNext()">Next</button>
-            <button id="submit-btn" class="hidden" onclick="finishExam()">Submit</button>
+            <button id="prev-btn" class="nav-btn" onclick="movePrev()">ወደኋላ</button>
+            <button id="next-btn" class="nav-btn" onclick="moveNext()">ቀጣይ</button>
+            <button id="submit-btn" class="btn-main hidden" onclick="finishExam()">ፈተናውን ጨርስ</button>
         </div>
     </section>
 
     <section id="result-page" class="screen">
         <h2>የፈተና ውጤት</h2>
-        <div class="score-box">
+        <div class="score-circle">
             <h1 id="final-score">0</h1>
         </div>
-        <div id="corrections"></div>
-        <button class="btn-primary" onclick="location.reload()">እንደገና ጀምር</button>
+        <div id="corrections-list"></div>
+        <button class="btn-main" onclick="location.reload()">ወደ መጀመሪያ ተመለስ</button>
     </section>
 
     <section id="admin-page" class="screen">
         <h2>Admin Dashboard</h2>
-        <textarea id="pdf-input" placeholder="ጥያቄዎችን እዚህ ይለጥፉ (ጥያቄ... A... B... C... D...)"></textarea>
-        <button class="btn-primary" onclick="parseBulk()">ጥያቄዎቹን ጫን</button>
-        <div class="ocr-section">
-            <label>በፎቶ ለመጫን፡</label>
-            <input type="file" accept="image/*" capture="camera">
-        </div>
-        <button class="btn-back" onclick="navigateTo('welcome-page')">ውጣ</button>
+        <textarea id="pdf-input" placeholder="ጥያቄዎችን እዚህ ይለጥፉ..."></textarea>
+        <button class="btn-main" onclick="alert('ጥያቄ ተጭኗል!')">ጥያቄዎችን ጫን</button>
+        <p class="back-link" onclick="navigateTo('welcome-page')">ውጣ</p>
     </section>
 
     <section id="qr-scanner-page" class="screen">
-        <div id="reader" style="width:100%"></div>
-        <button class="btn-back" onclick="navigateTo('welcome-page')">ተመለስ</button>
+        <div id="reader" style="width: 100%;"></div>
+        <p class="back-link" onclick="navigateTo('welcome-page')">ተመለስ</p>
     </section>
 
     <script src="script.js"></script>
