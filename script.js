@@ -6,10 +6,10 @@ let timer;
 let timeLeft = 3600;
 
 // ናሙና ጥያቄዎች
-const db = {
+const database = {
     natural: [
-        { q: "የኢትዮጵያ ረጅሙ ወንዝ የትኛው ነው?", a: "አባይ", b: "አዋሽ", c: "ገናሌ", d: "ዋቢ ሸበሌ", r: "A" },
-        { q: "2 x 10 ስንት ነው?", a: "12", b: "20", c: "21", d: "100", r: "B" }
+        { q: "የኢትዮጵያ ረጅሙ ወንዝ የትኛው ነው?", a: "አባይ", b: "ዋቢ ሸበሌ", c: "አዋሽ", d: "ገናሌ", r: "A" },
+        { q: "ብርሃን በሰከንድ ስንት ኪሎሜትር ይጓዛል?", a: "300,000", b: "150,000", c: "500,000", d: "1,000,000", r: "A" }
     ],
     social: [
         { q: "የኢትዮጵያ ዋና ከተማ ማን ናት?", a: "ጎንደር", b: "አክሱም", c: "አዲስ አበባ", d: "ሀዋሳ", r: "C" }
@@ -22,7 +22,8 @@ function navigateTo(id) {
 }
 
 function askAdminPassword() {
-    if (prompt("Password ያስገቡ:") === ADMIN_PASS) navigateTo('admin-page');
+    let p = prompt("Password ያስገቡ:");
+    if (p === ADMIN_PASS) navigateTo('admin-page');
     else alert("ስህተት!");
 }
 
@@ -32,7 +33,7 @@ function showSubjects(field) {
     document.getElementById('field-title').innerText = field.toUpperCase();
     
     const subs = field === 'natural' ? 
-        ['English', 'Maths', 'Physics', 'Chemistry', 'IT'] : 
+        ['English', 'Maths', 'Physics', 'Chemistry', 'Biology'] : 
         ['English', 'Maths', 'History', 'Geography', 'Economics'];
 
     subs.forEach(s => {
@@ -46,7 +47,7 @@ function showSubjects(field) {
 }
 
 function startExam(field) {
-    questions = db[field];
+    questions = database[field];
     currentIdx = 0;
     userAnswers = {};
     timeLeft = 3600;
@@ -58,17 +59,18 @@ function startExam(field) {
 function showQuestion() {
     const q = questions[currentIdx];
     document.getElementById('q-text').innerText = q.q;
-    document.getElementById('q-progress').innerText = `ጥያቄ ${currentIdx + 1}/${questions.length}`;
+    document.getElementById('q-count').innerText = `ጥያቄ ${currentIdx + 1}/${questions.length}`;
     
     const container = document.getElementById('options-list');
     container.innerHTML = `
-        <button class="option-btn ${userAnswers[currentIdx]=='A'?'selected':''}" onclick="pick('A')">A. ${q.a}</button>
-        <button class="option-btn ${userAnswers[currentIdx]=='B'?'selected':''}" onclick="pick('B')">B. ${q.b}</button>
-        <button class="option-btn ${userAnswers[currentIdx]=='C'?'selected':''}" onclick="pick('C')">C. ${q.c}</button>
-        <button class="option-btn ${userAnswers[currentIdx]=='D'?'selected':''}" onclick="pick('D')">D. ${q.d}</button>
+        <button class="option-btn ${userAnswers[currentIdx]=='A'?'selected':''}" onclick="select('A')">A. ${q.a}</button>
+        <button class="option-btn ${userAnswers[currentIdx]=='B'?'selected':''}" onclick="select('B')">B. ${q.b}</button>
+        <button class="option-btn ${userAnswers[currentIdx]=='C'?'selected':''}" onclick="select('C')">C. ${q.c}</button>
+        <button class="option-btn ${userAnswers[currentIdx]=='D'?'selected':''}" onclick="select('D')">D. ${q.d}</button>
     `;
 
-    document.getElementById('prev-btn').disabled = (currentIdx === 0);
+    document.getElementById('prev-btn').style.visibility = (currentIdx === 0) ? "hidden" : "visible";
+    
     if (currentIdx === questions.length - 1) {
         document.getElementById('next-btn').classList.add('hidden');
         document.getElementById('submit-btn').classList.remove('hidden');
@@ -78,13 +80,13 @@ function showQuestion() {
     }
 }
 
-function pick(ans) {
+function select(ans) {
     userAnswers[currentIdx] = ans;
     showQuestion();
 }
 
 function moveNext() {
-    if (!userAnswers[currentIdx]) return alert("መልስ ይምረጡ!");
+    if (!userAnswers[currentIdx]) return alert("እባክዎ መልስ ይምረጡ!");
     currentIdx++;
     showQuestion();
 }
@@ -100,10 +102,10 @@ function startTimer() {
     if (timer) clearInterval(timer);
     timer = setInterval(() => {
         timeLeft--;
-        if (timeLeft <= 0) finishExam();
         let m = Math.floor(timeLeft / 60);
         let s = timeLeft % 60;
-        document.getElementById('timer').innerText = `ጊዜ: ${m}:${s < 10 ? '0' + s : s}`;
+        document.getElementById('timer').innerText = `ጊዜ: ${m}:${s < 10 ? '0'+s : s}`;
+        if (timeLeft <= 0) finishExam();
     }, 1000);
 }
 
@@ -111,10 +113,6 @@ function finishExam() {
     clearInterval(timer);
     let score = 0;
     questions.forEach((q, i) => { if (userAnswers[i] === q.r) score++; });
-    document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
+    document.getElementById('final-score').innerText = `${score}/${questions.length}`;
     navigateTo('result-page');
-}
-
-function parseBulk() {
-    alert("ጥያቄዎቹ በተሳካ ሁኔታ ተጭነዋል!");
 }
