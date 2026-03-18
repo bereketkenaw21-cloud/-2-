@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mertule Mariyam Offline Exam App</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="js/qrcode.min.js"></script>
+    <script src="js/html5-qrcode.min.js"></script>
+</head>
+<body>
+
+    <section id="welcome-page" class="active-screen">
+        <div class="hero-container">
+            <h1 class="animate-text">እንኳን ወደ መርጡለ ማሪያም 2ኛ ደረጃ ትምህርት ቤት የብሔራዊ ፈተና መለማመጃ ሲስተም በደህና መጡ።</h1>
+            <h2 class="creator-tag">አዘጋጅ፡ በረከት ቀናው</h2>
+            <div class="main-actions">
+                <button class="btn-primary" onclick="navigateTo('login-choice')">ይግቡ</button>
+                <button class="btn-secondary" onclick="openScanner()">ጥያቄ በ QR ኮድ ይቀበሉ</button>
+            </div>
+            <div id="reader" style="width: 300px; margin-top: 20px;"></div>
+        </div>
+    </section>
+
+    <section id="login-choice" class="hidden">
+        <div class="choice-box">
+            <button class="role-btn" onclick="enterAsStudent()">ተማሪ</button>
+            <hr>
+            <button class="role-btn admin-color" onclick="askAdminPassword()">Admin</button>
+        </div>
+    </section>
+
+    <section id="field-page" class="hidden">
+        <h2>የትምህርት ዘርፍዎን ይምረጡ</h2>
+        <div class="field-grid">
+            <div class="field-card" onclick="showSubjects('natural')">
+                <div class="field-icon">🔬</div>
+                <p>Natural Science</p>
+            </div>
+            <div class="field-card" onclick="showSubjects('social')">
+                <div class="field-icon">🌍</div>
+                <p>Social Science</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="subject-page" class="hidden">
+        <h2 id="field-title">ትምህርት ይምረጡ</h2>
+        <div id="subjects-container" class="subject-grid">
+            </div>
+    </section>
+
+    <section id="exam-page" class="hidden">
+        <div class="exam-header">
+            <div class="timer-box">ጊዜ፡ <span id="timer-display">01:00:00</span></div>
+            <div class="progress-box">ጥያቄ፡ <span id="current-q-num">1</span>/<span id="total-q-num">0</span></div>
+        </div>
+        
+        <div class="question-area">
+            <p id="q-text" class="question-body"></p>
+            <div id="options-list" class="options-grid">
+                </div>
+        </div>
+
+        <div class="exam-controls">
+            <button id="prev-btn" onclick="movePrev()" disabled>ወደኋላ</button>
+            <button id="next-btn" onclick="moveNext()">Next</button>
+            <button id="final-submit" class="hidden" onclick="finishExam()">Submit</button>
+        </div>
+    </section>
+
+    <section id="result-page" class="hidden">
+        <h2>የፈተና ውጤት</h2>
+        <div class="score-circle">
+            <span id="final-score">0</span>
+        </div>
+        <div id="review-area">
+            <h3>የተሳሳቱ ጥያቄዎች እና ትክክለኛ መልሶች</h3>
+            <div id="correction-list"></div>
+        </div>
+        <button onclick="location.reload()">ወደ መጀመሪያ ተመለስ</button>
+    </section>
+
+    <section id="admin-page" class="hidden">
+        <h2>Admin Dashboard</h2>
+        <div class="admin-tools">
+            <div class="tool-section">
+                <label>ከ PDF ኮፒ ያደረጉትን እዚህ ይለጥፉ፡</label>
+                <textarea id="pdf-input" placeholder="ጥያቄ 1... A... B... C... D..."></textarea>
+                <button class="btn-save" onclick="parsePDFText()">ጥያቄዎችን ቀይር (Process)</button>
+            </div>
+            
+            <div class="tool-section">
+                <label>ከወረቀት ፎቶ አንስተው ለመጫን፡</label>
+                <input type="file" id="image-ocr" accept="image/*" capture="camera">
+                <button class="btn-save" onclick="handleImageUpload()">ወደ ጥያቄ ቀይር</button>
+            </div>
+
+            <div id="qr-generation-area" class="tool-section">
+                <h3>ጥያቄውን ለተማሪዎች ያጋሩ</h3>
+                <div id="qrcode"></div>
+                <p>ተማሪዎች ይህንን QR Scan በማድረግ ጥያቄውን መጫን ይችላሉ።</p>
+            </div>
+        </div>
+        <button onclick="navigateTo('welcome-page')">ውጣ</button>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
